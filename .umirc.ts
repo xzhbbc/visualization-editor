@@ -1,12 +1,13 @@
-import { defineConfig } from 'umi';
+import { defineConfig } from 'umi'
 
 export default defineConfig({
   nodeModulesTransform: {
-    type: 'none',
+    type: 'none'
   },
   sass: {},
-  routes: [
-    { path: '/', component: '@/pages/index' },
-  ],
+  routes: [{ path: '/', component: '@/pages/index' }],
   fastRefresh: {},
-});
+  dva: {
+    immer: true
+  }
+})
