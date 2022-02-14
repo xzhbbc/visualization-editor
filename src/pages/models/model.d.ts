@@ -8,10 +8,20 @@ export interface Model<T = any> {
   }
 }
 
-export type StateData = {
+export type EditorStateData = {
   widgetData: Array<WidgetData>
+  currentIndex: number
+  type: any
 }
 
 export type ModelData = {
-  editor: StateData
+  editor: EditorStateData
+}
+
+export enum EditorType {
+  ADD = 'ADD',
+  FIX = 'FIX',
+  MOVE = 'MOVE',
+  EDIT = 'EDIT',
+  IDLE = 'IDLE'
 }

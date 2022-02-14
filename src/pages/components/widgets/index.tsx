@@ -6,7 +6,7 @@ const Widgets = () => {
   return (
     <div>
       {widgetConfigList.map(item => (
-        <DraggableBox item={item}>
+        <DraggableBox key={item.name} item={item}>
           <div>{item.name}</div>
         </DraggableBox>
       ))}

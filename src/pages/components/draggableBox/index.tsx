@@ -9,6 +9,7 @@ type IProps = {
 }
 
 const DraggableBox: React.FC<IProps> = ({ children, item }) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const [{ isDragging }, drag] = useDrag({
     type: DRAGGABLE_KEY,

@@ -14,6 +14,7 @@ export type WidgetData = {
   config: any
   name: string
   id: string
+  height?: number
 }
 
 const TipsConfig: WidgetConfig = {

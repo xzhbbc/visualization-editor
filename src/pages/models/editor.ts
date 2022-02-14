@@ -1,21 +1,35 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Model, StateData } from './model'
+import { Model, EditorStateData } from './model'
 
-const model: Model<StateData> = {
+enum EditorType {
+  ADD = 'ADD',
+  FIX = 'FIX',
+  MOVE = 'MOVE',
+  EDIT = 'EDIT',
+  IDLE = 'IDLE'
+}
+
+const model: Model<EditorStateData> = {
   namespace: 'editor',
   state: {
-    widgetData: []
+    widgetData: [],
+    currentIndex: 0,
+    type: 'IDLE'
   },
   reducers: {
-    addWidget(state, { widget }) {
+    addWidget(state, { widget, addIndex }) {
+      const widgetData = [...state.widgetData]
       // console.log(widget, 'widgetMsg')
       const data = {
         ...widget,
         id: uuidv4()
       }
+      console.log(addIndex, 'add', data)
+      widgetData.splice(addIndex, 0, data)
       return {
         ...state,
-        widgetData: [...state.widgetData, data]
+        widgetData,
+        type: EditorType.ADD
       }
     },
     moveWidget(state, { index, moveIndex }) {
@@ -26,7 +40,22 @@ const model: Model<StateData> = {
       data.splice(moveIndex, 0, cur)
       return {
         ...state,
-        widgetData: data
+        widgetData: data,
+        type: EditorType.MOVE
+      }
+    },
+    setWidgetHeight(state, { index, height }) {
+      console.log('setWidgetDataHeight===')
+      const data = [...state.widgetData]
+      const cur = {
+        ...data[index]
+      }
+      cur.height = height
+      data.splice(index, 1, cur)
+      return {
+        ...state,
+        widgetData: data,
+        type: EditorType.IDLE
       }
     }
   }
