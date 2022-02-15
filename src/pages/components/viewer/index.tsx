@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import {
   ConnectDropTarget,
   DropTarget,
@@ -10,11 +10,10 @@ import {
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 import styles from './index.scss'
 import { DRAGGABLE_KEY } from '@/pages/config/constans'
-import { WidgetConfig } from '@/pages/config/config'
+import { EmptyConfig, WidgetConfig } from '@/pages/config/config'
 import { useDispatch, useSelector } from 'react-redux'
 import { ModelData } from '@/pages/models/model'
 import _ from 'lodash'
-import widgets from '../widgets'
 
 const type = 'Box'
 
@@ -26,10 +25,11 @@ const List = (props: { connectDropTarget: ConnectDropTarget }) => {
 const DndList = DropTarget(type, {}, connect => ({
   connectDropTarget: connect.dropTarget()
 }))(List)
-let addIndex = 0
 const Viewer = () => {
   const dispatchData = useDispatch()
   const domRef = useRef<any>()
+  const operation = useRef<number>()
+  const [hoverIndex, setHoverIndex] = useState<number>(-1)
   const editorModel = useSelector((store: ModelData) => store.editor)
   const [componentList, setComponentList] = useState<WidgetConfig[]>([])
 
@@ -42,17 +42,31 @@ const Viewer = () => {
       // console.log(e, 'hover-add', offset)
       if (editorModel.widgetData.length > 0) {
         let sumY = 0
+        const firstHeight = editorModel.widgetData[0].height || 0
+        if (y < firstHeight) {
+          setHoverIndex(0)
+          operation.current = 0
+          return
+        }
         for (let i = 0; i < editorModel.widgetData.length; i++) {
           const item = editorModel.widgetData[i]
           sumY += item.height || 0
           if (sumY > y) {
-            console.log(sumY, 'cal-add', i, y, editorModel.widgetData)
-            addIndex = i
+            // console.log(sumY, 'cal-add', i, y, editorModel.widgetData)
+            operation.current = i
+            setHoverIndex(i)
             break
           }
         }
+        // 可能是最后个的情况
+        if (sumY < y) {
+          // console.log('最后一个', y)
+          setHoverIndex(editorModel.widgetData.length)
+          operation.current = editorModel.widgetData.length
+        }
       } else {
-        addIndex = 0
+        setHoverIndex(0)
+        operation.current = 0
       }
     }
   }
@@ -62,14 +76,20 @@ const Viewer = () => {
     accept: DRAGGABLE_KEY,
     // collect 函数，返回的对象会成为 useDrop 的第一个参数，可以在组件中直接进行使用
     collect: (monitor: DropTargetMonitor) => {
-      console.log(monitor.getClientOffset(), 'monitor')
+      if (
+        !monitor.getDropResult() &&
+        !monitor.isOver() &&
+        editorModel.type == 'IDLE'
+      ) {
+        operation.current = -1
+        setHoverIndex(-1)
+      }
       return {
         isOver: monitor.isOver()
       }
     },
-    hover: _.debounce(hoverCallback, 0, {
-      leading: true
-    }),
+    // hover: _.debounce(hoverCallback, 300),
+    hover: hoverCallback,
     drop: (e: any, ac) => {
       const components = [...componentList]
       const componentMsg = e as WidgetConfig
@@ -77,9 +97,10 @@ const Viewer = () => {
         dispatchData({
           type: 'editor/addWidget',
           widget: e,
-          addIndex
+          addIndex: operation.current
         })
-        addIndex = 0
+        operation.current = -1
+        setHoverIndex(-1)
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         components.push(e)
@@ -92,8 +113,8 @@ const Viewer = () => {
   //   type: 'Viewer',
   //   item: componentList
   // })
-  console.log(collectProps, 'collectProps===')
-  const dragDropManager = useDragDropManager()
+  // console.log(collectProps, 'collectProps===')
+  // const dragDropManager = useDragDropManager()
   const content = collectProps.isOver
     ? '快松开，放到碗里来'
     : '将 Box 组件拖动到这里'
@@ -134,6 +155,18 @@ const Viewer = () => {
     }
   }, [editorModel.widgetData])
 
+  const widgetData = useMemo(() => {
+    const data = [...editorModel.widgetData]
+    console.log('widgetList在刷新add', hoverIndex)
+    if (hoverIndex > -1) {
+      data.splice(hoverIndex, 0, {
+        ...EmptyConfig,
+        id: 'empty-id'
+      })
+    }
+    return data
+  }, [editorModel.widgetData, hoverIndex])
+
   return (
     <div className={styles.viewer}>
       <div id="dropViewer" ref={dropViewer}>
@@ -146,7 +179,7 @@ const Viewer = () => {
                 // 为了使 droppable 能够正常工作必须 绑定到最高可能的DOM节点中provided.innerRef.
                 ref={provided.innerRef}
               >
-                {editorModel.widgetData.map((item, i) => (
+                {widgetData.map((item, i) => (
                   <Draggable draggableId={item.id} index={i} key={item.id}>
                     {provided => (
                       <div

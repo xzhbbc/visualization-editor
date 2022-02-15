@@ -29,7 +29,8 @@ const model: Model<EditorStateData> = {
       return {
         ...state,
         widgetData,
-        type: EditorType.ADD
+        type: EditorType.ADD,
+        currentIndex: addIndex
       }
     },
     moveWidget(state, { index, moveIndex }) {

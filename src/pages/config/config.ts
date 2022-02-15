@@ -1,3 +1,4 @@
+import EmptyView from '../components/emptyView'
 import Search from '../components/search'
 import Tips from '../components/tips'
 
@@ -15,6 +16,13 @@ export type WidgetData = {
   name: string
   id: string
   height?: number
+}
+
+export const EmptyConfig: WidgetConfig = {
+  type: 'empty',
+  component: EmptyView,
+  config: {},
+  name: '空占位'
 }
 
 const TipsConfig: WidgetConfig = {
