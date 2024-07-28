@@ -190,8 +190,7 @@ const Viewer = () => {
                         // onClick={setCurrentWidget}
                       >
                         <>
-                          <item.component key={item.id} />
-                          {item.id}
+                          <item.component key={item.id} {...item.config} />
                         </>
                       </div>
                     )}

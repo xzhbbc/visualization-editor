@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@ant-design/pro-layout": "^6.5.0",
+    "antd-mobile": "^5.37.1",
     "lodash": "^4.17.21",
     "node-sass": "^7.0.1",
     "react": "17.x",
@@ -49,7 +50,7 @@
     "@typescript-eslint/parser": "^5.10.1",
     "@umijs/fabric": "^2.10.1",
     "@umijs/plugin-sass": "^1.1.1",
-    "@umijs/preset-react": "1.x",
+    "@umijs/preset-react": "^2.1.7",
     "@umijs/test": "^3.5.20",
     "eslint": "8.1.0",
     "eslint-config-prettier": "^8.3.0",

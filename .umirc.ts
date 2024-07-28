@@ -7,6 +7,7 @@ export default defineConfig({
   sass: {},
   routes: [{ path: '/', component: '@/pages/index' }],
   fastRefresh: {},
+  antdMobile: {},
   dva: {
     immer: true
   }
