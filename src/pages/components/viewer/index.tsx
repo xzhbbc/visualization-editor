@@ -169,7 +169,7 @@ const Viewer = () => {
 
   return (
     <div className={styles.viewer}>
-      <div id="dropViewer" ref={dropViewer}>
+      <div className={styles.container} id="dropViewer" ref={dropViewer}>
         <DragDropContext onDragEnd={dragEnd}>
           <Droppable droppableId={DRAGGABLE_KEY}>
             {provided => (
